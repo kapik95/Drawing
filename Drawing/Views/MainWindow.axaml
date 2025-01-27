@@ -3,18 +3,44 @@
         xmlns:vm="using:Drawing.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
+		Width="800" Height="600"
         x:Class="Drawing.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="AVG_CUBE">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="3*" /> <!--Для сцены-->
+			<ColumnDefinition Width="1*" /> <!--Для панели-->
+		</Grid.ColumnDefinitions>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		<Border Grid.Column="0" 
+				Background="Gray" 
+				Margin="10">
+			<Canvas x:Name="DrawingCanvas" />
+		</Border>
 
+		<StackPanel Grid.Column="1"
+					Margin="10"
+					Spacing="10">
+
+			<Button x:Name="startButton"
+					Content="Начать рисование"/>
+			
+			<ComboBox x:Name="drawingModeComboBox" 
+					  IsEnabled="False">
+
+				<ComboBoxItem Content="Ребра"/>
+				<ComboBoxItem Content="Ребра и поверхности"/>
+				<ComboBoxItem Content="Поверхности"/>
+			
+			</ComboBox>
+
+			<Button x:Name="stopButton"
+					Content="Закончить рисование"
+					IsEnabled="False"/>
+		</StackPanel>
+	</Grid>
 </Window>
