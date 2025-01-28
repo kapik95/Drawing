@@ -27,20 +27,19 @@
 					Spacing="10">
 
 			<Button x:Name="startButton"
-					Content="Начать рисование"/>
+					Content="Начать рисование"
+					IsEnabled="{Binding !IsDrawingControlsEnabled}"
+					Command="{Binding DrawingStartCommand}"/>
 			
 			<ComboBox x:Name="drawingModeComboBox" 
-					  IsEnabled="False">
-
-				<ComboBoxItem Content="Ребра"/>
-				<ComboBoxItem Content="Ребра и поверхности"/>
-				<ComboBoxItem Content="Поверхности"/>
-			
-			</ComboBox>
+					  IsEnabled="{Binding IsDrawingControlsEnabled}"
+					  ItemsSource="{Binding Modes}"
+					  SelectedItem="{Binding SelectedMode}"/>
 
 			<Button x:Name="stopButton"
 					Content="Закончить рисование"
-					IsEnabled="False"/>
+					IsEnabled="{Binding IsDrawingControlsEnabled}"
+					Command="{Binding DrawingEndCommand}"/>
 		</StackPanel>
 	</Grid>
 </Window>
