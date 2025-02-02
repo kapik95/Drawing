@@ -6,6 +6,7 @@ namespace Drawing.ViewModels
     {
         private bool _isDrawing;
         private string _selectedMode;
+        private readonly string _defaultItem = "Поверхности";
 
         public RelayCommand DrawingStartCommand { get; }
         public RelayCommand DrawingEndCommand { get; }
@@ -25,7 +26,6 @@ namespace Drawing.ViewModels
                 if (_isDrawing != value)
                 {
                     _isDrawing = value;
-                    //OnPropertyChanged(nameof(IsDrawing));
                     OnPropertyChanged(nameof(IsDrawingControlsEnabled));
                     DrawingStartCommand.RaiseCanExecuteChanged();
                     DrawingEndCommand.RaiseCanExecuteChanged();
@@ -53,14 +53,13 @@ namespace Drawing.ViewModels
         {
             DrawingStartCommand = new RelayCommand(DrawingStart);
             DrawingEndCommand = new RelayCommand(DrawingEnd);
-            SelectedMode = "Поверхности";
+            SelectedMode = _defaultItem;
         }
 
         private void DrawingStart()
         {
             IsDrawing = true;
-            SelectedMode = "Поверхности"; // По умолчанию
-
+            SelectedMode = _defaultItem;
         }
 
         private void DrawingEnd()

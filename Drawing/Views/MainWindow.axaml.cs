@@ -1,4 +1,7 @@
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using System;
+using System.Diagnostics;
 
 namespace Drawing.Views
 {
@@ -7,6 +10,13 @@ namespace Drawing.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }
