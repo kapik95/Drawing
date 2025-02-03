@@ -3,7 +3,7 @@ using Avalonia.OpenGL;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace Drawing.Helpers
+namespace Drawing.Controls
 {
     /// <summary>
     /// Этот код представляет собой связующее звено между Avalonia и OpenGL, 
@@ -20,10 +20,9 @@ namespace Drawing.Helpers
             _gl = gl;
         }
 
-        public IntPtr GetProcAddress(string procName)
+        public nint GetProcAddress(string procName)
         {
             return _gl.GetProcAddress(procName);
         }
     }
 }
- 
