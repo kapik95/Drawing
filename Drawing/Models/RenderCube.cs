@@ -13,7 +13,7 @@ namespace Drawing.Models
         private Shader _shader;
 
         private static float _scale = 1.0f;
-        private float _rotationX = 0.0f, _rotationY = 0.0f;
+        private static float _rotationX = 0.0f, _rotationY = 0.0f;
 
 
         private readonly float[] _vertices =
@@ -83,7 +83,6 @@ namespace Drawing.Models
         private Matrix4 GetModelMatrix()
         {
             var model = Matrix4.Identity;
-            Debug.WriteLine($"Matrix4 {_scale}");
             model *= Matrix4.CreateScale(_scale);
             model *= Matrix4.CreateRotationX(MathHelper.DegreesToRadians(_rotationX));
             model *= Matrix4.CreateRotationY(MathHelper.DegreesToRadians(_rotationY));
@@ -94,13 +93,13 @@ namespace Drawing.Models
         {
             _scale = Math.Clamp(_scale + delta, 0.5f, 2.0f);
 
-            Debug.WriteLine($"Delta: {_scale}");
         }
 
         public void Rotate(float deltaX, float deltaY)
         {
-            _rotationX += deltaX;
-            _rotationY += deltaY;
+            var speedRotation = 0.0025f;
+            _rotationX += deltaX * speedRotation;
+            _rotationY += deltaY * speedRotation;
         }
     }
 }
