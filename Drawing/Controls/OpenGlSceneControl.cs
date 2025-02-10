@@ -1,6 +1,9 @@
-﻿using Avalonia.OpenGL;
+﻿using Avalonia;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
-using Drawing.Helpers;
+using Avalonia.Threading;
 using Drawing.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -14,14 +17,16 @@ namespace Drawing.Controls
     {
         private RenderCube _cube;
         private float _rotationAngle = 0f;
-        private int _shaderProgram;
+        private float _width, _height;
 
         protected override void OnOpenGlInit(GlInterface gl)
         {
             base.OnOpenGlInit(gl);
-
             // Загружаем OpenGL-контекст
             GL.LoadBindings(new AvaloniaGlBindingsContext(gl));
+
+            _width = (int)this.Bounds.Width;
+            _height = (int)this.Bounds.Height;
 
             Debug.WriteLine($"OpenGL версия: {GL.GetString(StringName.Version)}");
             Debug.WriteLine($"Графический драйвер: {GL.GetString(StringName.Renderer)}");
@@ -35,15 +40,20 @@ namespace Drawing.Controls
 
             GL.DepthFunc(DepthFunction.Less);
 
-            // Теперь можно инициализировать рендеринг
             _cube = new RenderCube();
             _cube.Init();
+
+            _timer.Tick += (s, e) => RequestNextFrameRendering();
+            _timer.Start();
         }
 
         protected override void OnOpenGlRender(GlInterface gl, int framebuffer)
         {
+
+            // Теперь можно инициализировать рендеринг
+
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer); // Привязываем переданный Framebuffer
-            GL.Viewport(0, 0, 800, 600);
+            GL.Viewport(0, 0, (int)_width, (int)_height);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(Color4.CornflowerBlue);
@@ -51,22 +61,16 @@ namespace Drawing.Controls
             _rotationAngle += 0.01f;
             Matrix4 model = Matrix4.CreateRotationY(_rotationAngle);
             Matrix4 view = Matrix4.CreateTranslation(0, 0, -3);
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), 800f / 600f, 0.1f, 100f);
-
-            _cube.Draw(model, view, projection);
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), _width / _height, 0.1f, 100f);
+            _cube.Draw( view, projection);
         }
 
-
-
-
-        // Метод для проверки ошибок OpenGL
-        private void CheckGlError(string operation)
+        /// <summary>
+        /// Таймер для перерисовки сцены 16 милисек = 60 fps
+        /// </summary>
+        private readonly DispatcherTimer _timer = new DispatcherTimer
         {
-            ErrorCode error = GL.GetError();
-            if (error != ErrorCode.NoError)
-            {
-                Debug.WriteLine($"OpenGL Error after {operation}: {error}");
-            }
-        }
+            Interval = TimeSpan.FromMilliseconds(16)
+        };
     }
 }

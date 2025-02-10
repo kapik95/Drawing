@@ -1,4 +1,5 @@
 ﻿using Drawing.Helpers;
+using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -11,18 +12,21 @@ namespace Drawing.Models
         private int _vao, _vbo, _ebo;
         private Shader _shader;
 
+        private static float _scale = 1.0f;
+        private float _rotationX = 0.0f, _rotationY = 0.0f;
+
 
         private readonly float[] _vertices =
         {
             //  Координаты XYZ        Цвета RGB
-            -0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
              0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f
+             0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f
         };
 
         private readonly uint[] _indices =
@@ -60,9 +64,12 @@ namespace Drawing.Models
             GL.BindVertexArray(0);
         }
 
-        public void Draw(Matrix4 model, Matrix4 view, Matrix4 projection)
+        public void Draw(Matrix4 view, Matrix4 projection)
         {
             _shader.Use();
+
+            Matrix4 model = GetModelMatrix();
+
             GL.UniformMatrix4(GL.GetUniformLocation(_shader.Handle, "model"), false, ref model);
             GL.UniformMatrix4(GL.GetUniformLocation(_shader.Handle, "view"), false, ref view);
             GL.UniformMatrix4(GL.GetUniformLocation(_shader.Handle, "projection"), false, ref projection);
@@ -71,6 +78,29 @@ namespace Drawing.Models
             GL.UseProgram(_shader.Handle);
 
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+        }
+
+        private Matrix4 GetModelMatrix()
+        {
+            var model = Matrix4.Identity;
+            Debug.WriteLine($"Matrix4 {_scale}");
+            model *= Matrix4.CreateScale(_scale);
+            model *= Matrix4.CreateRotationX(MathHelper.DegreesToRadians(_rotationX));
+            model *= Matrix4.CreateRotationY(MathHelper.DegreesToRadians(_rotationY));
+            return model;
+        }
+
+        public void Scale(float delta)
+        {
+            _scale = Math.Clamp(_scale + delta, 0.5f, 2.0f);
+
+            Debug.WriteLine($"Delta: {_scale}");
+        }
+
+        public void Rotate(float deltaX, float deltaY)
+        {
+            _rotationX += deltaX;
+            _rotationY += deltaY;
         }
     }
 }

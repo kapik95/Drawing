@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Avalonia.Animation;
+using Avalonia.Input;
+using Drawing.Models;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Drawing.ViewModels
 {
@@ -7,6 +11,7 @@ namespace Drawing.ViewModels
         private bool _isDrawing;
         private string _selectedMode;
         private readonly string _defaultItem = "Поверхности";
+        private RenderCube _cube = new RenderCube();
 
         public RelayCommand DrawingStartCommand { get; }
         public RelayCommand DrawingEndCommand { get; }
@@ -67,5 +72,8 @@ namespace Drawing.ViewModels
             IsDrawing = false;
             SelectedMode = null;
         }
+
+
+
     }
 }
