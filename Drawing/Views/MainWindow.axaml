@@ -23,8 +23,9 @@
 		<Border Grid.Column="0" 
 				Background="Gray" 
 				Margin="10"
-				PointerWheelChanged="OnPointerWheelChanged">
-			<controls:OpenGlSceneControl  />
+				PointerWheelChanged="OnPointerWheelChanged"
+				PointerPressed="OnPointerPressed">
+			<controls:OpenGlSceneControl/>
 		</Border>
 
 		<StackPanel Grid.Column="1"

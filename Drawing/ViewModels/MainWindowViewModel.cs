@@ -1,6 +1,8 @@
 ﻿using Avalonia.Animation;
 using Avalonia.Input;
+using Drawing.Controls;
 using Drawing.Models;
+using Drawing.Views;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -11,7 +13,7 @@ namespace Drawing.ViewModels
         private bool _isDrawing;
         private string _selectedMode;
         private readonly string _defaultItem = "Поверхности";
-        private RenderCube _cube = new RenderCube();
+
 
         public RelayCommand DrawingStartCommand { get; }
         public RelayCommand DrawingEndCommand { get; }
@@ -34,6 +36,9 @@ namespace Drawing.ViewModels
                     OnPropertyChanged(nameof(IsDrawingControlsEnabled));
                     DrawingStartCommand.RaiseCanExecuteChanged();
                     DrawingEndCommand.RaiseCanExecuteChanged();
+                    MainWindow.Drawing(_isDrawing); 
+
+                    RenderCube.Restart();
                 }
             }
         }
@@ -65,6 +70,7 @@ namespace Drawing.ViewModels
         {
             IsDrawing = true;
             SelectedMode = _defaultItem;
+
         }
 
         private void DrawingEnd()
@@ -72,8 +78,5 @@ namespace Drawing.ViewModels
             IsDrawing = false;
             SelectedMode = null;
         }
-
-
-
     }
 }

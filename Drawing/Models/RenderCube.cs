@@ -11,11 +11,15 @@ namespace Drawing.Models
     {
         private int _vao, _vbo, _ebo;
         private Shader _shader;
-
         private static float _scale = 1.0f;
         private static float _rotationX = 0.0f, _rotationY = 0.0f;
 
-
+        public static void Restart()
+        {
+            _scale = 1.0f;
+            _rotationX = 0.0f;
+            _rotationY = 0.0f;
+        }
         private readonly float[] _vertices =
         {
             //  Координаты XYZ        Цвета RGB
@@ -89,13 +93,12 @@ namespace Drawing.Models
             return model;
         }
 
-        public void Scale(float delta)
+        public static void Scale(float delta)
         {
             _scale = Math.Clamp(_scale + delta, 0.5f, 2.0f);
-
         }
 
-        public void Rotate(float deltaX, float deltaY)
+        public static void Rotate(float deltaX, float deltaY)
         {
             var speedRotation = 0.0025f;
             _rotationX += deltaX * speedRotation;

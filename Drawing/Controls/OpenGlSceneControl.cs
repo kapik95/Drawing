@@ -72,5 +72,7 @@ namespace Drawing.Controls
         {
             Interval = TimeSpan.FromMilliseconds(16)
         };
+
+        
     }
 }

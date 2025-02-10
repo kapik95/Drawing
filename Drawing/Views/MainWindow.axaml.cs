@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Drawing.Models;
+using Drawing.ViewModels;
 using System;
 using System.Diagnostics;
 
@@ -10,16 +11,20 @@ namespace Drawing.Views
 {
     public partial class MainWindow : Window
     {
-        private RenderCube _cube = new RenderCube();
         private bool _isDragging;
         private Point _lastPos;
+        private static bool _isDrawing;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-
+        public static void Drawing(bool draw)
+        {
+            _isDrawing = draw;
+            Debug.WriteLine(_isDrawing);
+        }
 
         private void InitializeComponent()
         {
@@ -29,23 +34,25 @@ namespace Drawing.Views
 
         private void OnPointerWheelChanged(object sender, PointerWheelEventArgs e)
         {
-            // Проверяем, что событие действительно получено
-            Debug.WriteLine("Колесо мыши вращается, delta = " + e.Delta);
-
-            // Масштабируем куб
-            _cube.Scale((float)e.Delta.Y * 0.1f);
+            if (_isDrawing == true) RenderCube.Scale((float)e.Delta.Y * 0.1f);
         }
 
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        private void OnPointerPressed(object sender, PointerPressedEventArgs e)
         {
-            _isDragging = true;
-            e.Pointer.Capture(this);
-            _lastPos = e.GetPosition(null);
+            if(_isDrawing == true) 
+            {
+                _isDragging = true;
+                Debug.WriteLine(_isDragging);
+                e.Pointer.Capture(this);
+                _lastPos = e.GetPosition(null);
+            }
         }
 
-        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        protected override void OnPointerReleased( PointerReleasedEventArgs e)
         {
             _isDragging = false;
+            e.Pointer.Capture(null);
+            Debug.WriteLine(_isDragging);
         }
 
         protected override void OnPointerMoved(PointerEventArgs e)
@@ -60,9 +67,9 @@ namespace Drawing.Views
             var deltaY = pos.X - _lastPos.X;
             var deltaX = pos.Y - _lastPos.Y;
 
-            if (_lastPos.X >  pos.X || _lastPos.Y > pos.Y)
+            if (_lastPos.X > pos.X || _lastPos.Y > pos.Y)
             {
-                if(revers = false)
+                if (revers = false)
                 {
                     deltaX = 0.0f;
                     deltaY = 0.0f;
@@ -70,8 +77,7 @@ namespace Drawing.Views
                 }
             }
             revers = false;
-            Debug.WriteLine($"{deltaX} {deltaY}");
-            _cube.Rotate((float)deltaX, (float)deltaY);
+            RenderCube.Rotate((float)deltaX, (float)deltaY);
         }
     }
 }
