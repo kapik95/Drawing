@@ -14,23 +14,28 @@ namespace Drawing.Models
         private static float _scale = 1.0f;
         private static float _rotationX = 0.0f, _rotationY = 0.0f;
 
-        public static void Restart()
-        {
-            _scale = 1.0f;
-            _rotationX = 0.0f;
-            _rotationY = 0.0f;
-        }
         private readonly float[] _vertices =
         {
-            //  Координаты XYZ        Цвета RGB
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f
+            // Координаты XYZ            Цвета RGB
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,   
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,   
+             0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,   
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,   
+    
+            -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f,   
+             0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 1.0f,   
+             0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,   
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,   
+
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,   
+             0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,   
+             0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f,   
+            -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f,   
+
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,   
+             0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,   
+             0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,   
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,   
         };
 
         private readonly uint[] _indices =
@@ -42,6 +47,27 @@ namespace Drawing.Models
             1, 2, 6, 6, 5, 1,
             0, 3, 7, 7, 4, 0
         };
+
+        private readonly uint[] _edgeIndices =
+        {
+            // Нижняя грань
+            0, 1, 
+            1, 2, 
+            2, 3, 
+            3, 0, 
+            // Верхняя грань
+            4, 5, 
+            5, 6, 
+            6, 7, 
+            7, 4, 
+            // Боковые ребра
+            0, 4, 
+            1, 5, 
+            2, 6, 
+            3, 7  
+        };
+
+        private static RenderMode _renderMode = RenderMode.FacesAndEdges;
 
         public void Init()
         {
@@ -78,10 +104,35 @@ namespace Drawing.Models
             GL.UniformMatrix4(GL.GetUniformLocation(_shader.Handle, "view"), false, ref view);
             GL.UniformMatrix4(GL.GetUniformLocation(_shader.Handle, "projection"), false, ref projection);
 
+            // Устанавливаем цвет для граней и поверхностей
+            GL.Uniform3(GL.GetUniformLocation(_shader.Handle, "edgeColor"), new Vector3(0.0f, 0.0f, 0.0f));  // Черный цвет для граней
+            GL.Uniform3(GL.GetUniformLocation(_shader.Handle, "faceColor"), new Vector3(0.0f, 1.0f, 1.0f));  // Голубой цвет для поверхностей
+
             GL.BindVertexArray(_vao);
             GL.UseProgram(_shader.Handle);
 
-            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+            if (_renderMode == RenderMode.FacesAndEdges)
+            {
+                // Рендерим поверхности
+                GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "isEdge"), 0.0f);
+                GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+
+                // Рендерим грани
+                GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "isEdge"), 1.0f);
+                GL.DrawElements(PrimitiveType.LineLoop, _edgeIndices.Length, DrawElementsType.UnsignedInt, 0);
+            }
+
+            else if (_renderMode == RenderMode.Faces)
+            {
+                GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "isEdge"), 0.0f); // false для поверхности
+                GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+            }
+            else if (_renderMode == RenderMode.Edges)
+            {
+                GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "isEdge"), 1.0f); // true для граней
+                GL.DrawElements(PrimitiveType.LineLoop, _edgeIndices.Length, DrawElementsType.UnsignedInt, 0);
+            }
+            GL.BindVertexArray(0);
         }
 
         private Matrix4 GetModelMatrix()
@@ -103,6 +154,25 @@ namespace Drawing.Models
             var speedRotation = 0.0025f;
             _rotationX += deltaX * speedRotation;
             _rotationY += deltaY * speedRotation;
+        }
+
+        public static void SetRenderMode(RenderMode mode)
+        {
+            _renderMode = mode;
+        }
+
+        public static void Restart()
+        {
+            _scale = 1.0f;
+            _rotationX = 0.0f;
+            _rotationY = 0.0f;
+        }
+
+        public enum RenderMode
+        {
+            FacesAndEdges, // Грани и поверхности
+            Faces,         // Только поверхности
+            Edges          // Только грани
         }
     }
 }

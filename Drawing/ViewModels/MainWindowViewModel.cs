@@ -1,10 +1,7 @@
-﻿using Avalonia.Animation;
-using Avalonia.Input;
-using Drawing.Controls;
-using Drawing.Models;
+﻿using Drawing.Models;
 using Drawing.Views;
 using System.Collections.Generic;
-using System.Diagnostics;
+using static Drawing.Models.RenderCube;
 
 namespace Drawing.ViewModels
 {
@@ -52,6 +49,9 @@ namespace Drawing.ViewModels
                 {
                     _selectedMode = value;
                     OnPropertyChanged(nameof(SelectedMode));
+
+                    UpdateRendering();
+                    RenderCube.Restart();
                 }
             }
         }
@@ -77,6 +77,25 @@ namespace Drawing.ViewModels
         {
             IsDrawing = false;
             SelectedMode = null;
+        }
+
+        public void UpdateRendering()
+        {
+            switch (SelectedMode)
+            {
+                case "Ребра":
+                    RenderCube.SetRenderMode(RenderMode.Edges);
+                    break;
+                case "Ребра и поверхности":
+                    RenderCube.SetRenderMode(RenderMode.FacesAndEdges);
+                    break;
+                case "Поверхности":
+                    RenderCube.SetRenderMode(RenderMode.Faces);
+                    break;
+                default:
+                    RenderCube.SetRenderMode(RenderMode.Faces);
+                    break;
+            }
         }
     }
 }
